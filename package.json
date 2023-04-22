@@ -1,0 +1,15 @@
+{
+  "name": "session-bot",
+  "version": "0.0.1",
+  "description": "a discord bot that prompts the user what they want to accomplish in their work/study session if they join a specific voice channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild index.ts --bundle --platform=node --outdir=./build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "0.17.17"
+  }
+}
