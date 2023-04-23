@@ -5,11 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "esbuild index.ts --bundle --platform=node --outdir=./build"
+    "build": "esbuild ./src/index.ts --bundle --minify --platform=node --outdir=./build",
+    "start:prod": "node ./build/index.js",
+    "dev": "nodemon ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "discord.js": "^14.9.0",
+    "dotenv": "^16.0.3",
     "esbuild": "0.17.17"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "eslint": "^8.39.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   }
 }
