@@ -1,4 +1,4 @@
-import { ClientEvents, Events, VoiceState } from "discord.js";
+import { APIEmbed, ClientEvents, Events, GuildMember, VoiceState } from "discord.js";
 import DiscordClientSingleton from "../services/DiscordClient";
 import { DiscordEventHandler } from "../models";
 import Environment from "../services/Environment";
@@ -41,29 +41,39 @@ class VoiceStateUpdateHandler implements DiscordEventHandler<Events.VoiceStateUp
 		}
 	
 		const discordClientService = DiscordClientSingleton?.getInstance();
-		const channel = await discordClientService.client?.channels.fetch(Environment.CHANNEL_ID ?? "");
+		const channel = await discordClientService.client?.channels.fetch(Environment.DEV_CHANNEL_ID ?? "");
 		
 		if (channel?.isTextBased()) {
-			const currentDate = new Date().toLocaleString("en-US", {dateStyle: "short"});
-	
 			channel.send({			
 				embeds: [
-					{
-						title: `[${currentDate}]: Session goals are`,
-						description: response,
-						author: {
-							name: member.user.username,
-						},
-						color: 5763719,
-					}
+					this.buildEmbedMessage(response, member),
 				]
 			});
+
+		
 
 			return;
 		}
 	};
 
-	determineVoiceEvent(oldVoiceState: VoiceState, newVoiceState: VoiceState): VoiceEvent {
+	private buildEmbedMessage(message: string, author: GuildMember): APIEmbed {
+		return {
+			title: "Session Goals",
+			description: message,
+			footer: {
+				text: author.displayName,
+				icon_url: author.user.avatarURL() ?? "",
+			},
+			color: 48028,
+			timestamp: new Date().toISOString(),
+			// fields: [
+			// 	{name: "Health 🏋️‍♀️", value: "- Workout 1 hour\n- Walk Chewy", inline: true},
+			// 	{name: "Study 📖", value: "- Study Rust", inline: true},
+			// ]
+		};
+	}
+
+	private determineVoiceEvent(oldVoiceState: VoiceState, newVoiceState: VoiceState): VoiceEvent {
 		const oldChannelExists = !!oldVoiceState.channelId;
 		const newChannelExists = !!newVoiceState.channelId;
 		const didMuteOrDeafen = newVoiceState.deaf || newVoiceState.mute;
