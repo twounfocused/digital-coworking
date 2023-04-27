@@ -32,8 +32,13 @@ class VoiceStateUpdateHandler implements DiscordEventHandler<Events.VoiceStateUp
 			max: 1,
 			time: 400000,
 		});
-	
+		
 		const response = collected.first()?.content;
+
+		if (!response) {
+			console.log("Empty string or response timed out!");
+			return;
+		}
 	
 		const discordClientService = DiscordClientSingleton?.getInstance();
 		const channel = await discordClientService.client?.channels.fetch(Environment.CHANNEL_ID ?? "");
