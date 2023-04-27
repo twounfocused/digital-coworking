@@ -3,22 +3,20 @@ import DiscordClientSingleton from "../services/DiscordClient";
 import { DiscordEventHandler } from "../models";
 import Environment from "../services/Environment";
 
-type VoiceEvent = "joined" | "left" | "switched"
+type VoiceEvent = "joined" | "left" | "switched" | "action"
 
 class VoiceStateUpdateHandler implements DiscordEventHandler<Events.VoiceStateUpdate> {
 	public event: keyof ClientEvents = Events.VoiceStateUpdate;
 
+
 	execute = async (oldState: VoiceState, newState: VoiceState): Promise<void> => {
-		
+
 		const {member} = newState;
 
-		const voiceEvent = this.determineVoiceEvent(oldState.channelId, newState.channelId);
+		const voiceEvent = this.determineVoiceEvent(oldState, newState);
+		process.stderr.write(`${newState.member?.user.username}: VoiceEvent: ${voiceEvent}\n`);
 	
-		if (voiceEvent !== "joined") {
-			return;
-		}
-	
-		if (!member) {
+		if (voiceEvent !== "joined" || !member) {
 			return;
 		}
 	
@@ -55,17 +53,26 @@ class VoiceStateUpdateHandler implements DiscordEventHandler<Events.VoiceStateUp
 					}
 				]
 			});
+
+			return;
 		}
-		
-		return;
 	};
 
-	determineVoiceEvent(oldChannelId: string | null, newChannelId: string | null): VoiceEvent {
-		if (oldChannelId && newChannelId) {
+	determineVoiceEvent(oldVoiceState: VoiceState, newVoiceState: VoiceState): VoiceEvent {
+		const oldChannelExists = !!oldVoiceState.channelId;
+		const newChannelExists = !!newVoiceState.channelId;
+		const didMuteOrDeafen = newVoiceState.deaf || newVoiceState.mute;
+		const didUnmuteOrUnDeafen = (oldVoiceState.mute || oldVoiceState.deaf) && (!newVoiceState.mute || !newVoiceState.deaf);
+		
+		if (didMuteOrDeafen || didUnmuteOrUnDeafen) {
+			return "action";
+		}
+
+		if (!oldChannelExists && !newChannelExists) {
 			return "left";
 		}
 	
-		if (!oldChannelId && newChannelId) {
+		if (!oldChannelExists && newChannelExists) {
 			return "joined";
 		}
 	
