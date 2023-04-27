@@ -13,6 +13,7 @@ class DiscordClientSingleton {
 
 	private constructor() {
 		// Adding private to constructor prevents class from being defined using `new` 
+		// Use `DiscordClientSingleton.getInstance()` instead
 	}
 
 	public static getInstance(): DiscordClientSingleton {
@@ -35,7 +36,6 @@ class DiscordClientSingleton {
 			this.initializeSlashCommands();
 			this.listenToSlashCommands();
 			this.listenToVoiceChannelEvents();
-			
 			
 			process.stderr.write("discord bot started!");
 		});
@@ -63,7 +63,6 @@ class DiscordClientSingleton {
 			}
 
 			Commands[commandName].execute(interaction);
-
 		});
 	}
 
